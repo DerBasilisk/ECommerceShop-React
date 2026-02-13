@@ -52,10 +52,10 @@ export default function Register(){
             setLoading(true);
 
             await axios.post("http://localhost:8081/api/user/register", {
-                name: formData.nombre,
-                tel: formData.telefono,
-                email: formData.email,
-                pass: formData.password
+                usuario: formData.nombre,
+                telefono: formData.telefono,
+                correo: formData.email,
+                passwords: formData.password
             });
 
             setMessage({ type:"success", text: "Cuenta creada exitosamente" });

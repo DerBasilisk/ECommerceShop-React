@@ -18,13 +18,13 @@ export default function Login(){
         setMessage({type: '', text: '' });
         try {
             const response = await axios.post('http://localhost:8081/api/login', {
-                email: email,
-                pass: password
+                correo: email,
+                passwords: password
             });
             const data = response.data; //axios parsea el JSON automaticamente
             setMessage({
                 type: 'success',
-                text: `¡Bienvenido ${data.usuario.name}!`
+                text: `¡Bienvenido ${data.usuario.usuario}!`
             });
             console.log('usuario:',data.usuario);
             localStorage.setItem('usuario', JSON.stringify(data.usuario));
