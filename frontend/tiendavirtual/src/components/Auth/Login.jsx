@@ -24,7 +24,7 @@ export default function Login(){
             const data = response.data; //axios parsea el JSON automaticamente
             setMessage({
                 type: 'success',
-                text: `¡Bienvenido ${data.usuario.usuario}!`
+                text: `¡Bienvenido ${data.usuario.nombre}!`
             });
             console.log('usuario:',data.usuario);
             localStorage.setItem('usuario', JSON.stringify(data.usuario));

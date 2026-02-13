@@ -1,22 +1,62 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/authcontext.jsx";
+import { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const PrivateRoute = ({ children, rolRequerido }) => {
-  const { usuario } = useAuth();
+const AuthContext = createContext();
 
-    // Si no hay usuario, redirigimos a login
-    if (!usuario) {
-        return <Navigate to="/login" replace />;
-}
+export const AuthProvider = ({ children }) => {
+    const [usuario, setUsuario] = useState(null);
+    const navigate = useNavigate();
 
-    // SI el rol no coincide, redirimos segun el rol del usuario
-    if (rolRequerido && usuario.rol !== rolRequerido) {
-        return usuario.rol === "admin"
-            ? <Navigate to="/admin" replace />
-            : <Navigate to="/productos" replace />;
-    }
+    const login = async (correo, password) => {
+        try {
+            const response = await axios.post("http://localhost:8081/api/login",
+                { correo:correo, 
+                    passwords:password,});
 
-    return children;
+
+            const data = response.data;
+
+
+            setUsuario({
+                ...data.usuario, 
+                token: data.token 
+            });
+
+            if(data.usuario.rol === "admin") {
+                navigate("/admin");
+            } else {
+                navigate("/productos");
+            }
+        
+        } catch (error) {
+            if (error.response) {
+                throw new Error(error.response.data.message || "Error al iniciar sesión");
+            } else if (error.request) {
+                throw new Error("No se pudo conectar al servidor");
+            } else {
+                throw new Error("Error al procesar la solicitud");
+            }
+        }
+
+    };
+
+    const logout = () => {
+        setUsuario(null);
+        navigate("/login");
+    };
+
+    return (
+        <AuthContext.Provider value={{ usuario, login, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
-
-export default PrivateRoute;
+    
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth debe ser usado dentro de un AuthProvider");
+    }
+    return context;
+};

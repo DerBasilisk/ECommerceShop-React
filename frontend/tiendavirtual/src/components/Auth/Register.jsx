@@ -52,7 +52,7 @@ export default function Register(){
             setLoading(true);
 
             await axios.post("http://localhost:8081/api/user/register", {
-                usuario: formData.nombre,
+                nombre: formData.nombre,
                 telefono: formData.telefono,
                 correo: formData.email,
                 passwords: formData.password
