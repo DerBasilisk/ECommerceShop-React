@@ -1,43 +1,62 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext.jsx";
-import PrivateRoute from "./components/PrivateRoute.jsx";
-import Login from "./components/Auth/Login";
-import Register from "./components/Auth/Register";
-import AdminPanel from "./components/Admin";
-import Home from "./components/Pages/Home";
-import Layout from "./components/Layout/Layout";
+import { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-function App() {
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+    const [usuario, setUsuario] = useState(null);
+    const navigate = useNavigate();
+
+    const login = async (correo, password) => {
+        try {
+            const response = await axios.post("http://localhost:8081/api/login",
+                { correo:correo, 
+                    passwords:password,});
+
+
+            const data = response.data;
+
+
+            setUsuario({
+                ...data.usuario, 
+                token: data.token 
+            });
+
+            if(data.usuario.rol === "admin") {
+                navigate("/admin");
+            } else {
+                navigate("/productos");
+            }
+        
+        } catch (error) {
+            if (error.response) {
+                throw new Error(error.response.data.message || "Error al iniciar sesión");
+            } else if (error.request) {
+                throw new Error("No se pudo conectar al servidor");
+            } else {
+                throw new Error("Error al procesar la solicitud");
+            }
+        }
+
+    };
+
+    const logout = () => {
+        setUsuario(null);
+        navigate("/login");
+    };
+
     return (
-        <BrowserRouter>
-            <AuthProvider>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-
-                    <Route path="/productos"
-                    element={
-                        <PrivateRoute rolRequerido="user">
-                            <Layout />
-                                <h1>Página de Productos</h1>
-                        </PrivateRoute>
-                    }
-                />
-
-                    <Route path="/admin"
-                    element={
-                        <PrivateRoute rolRequerido="admin">
-                            <AdminPanel />
-                        </PrivateRoute>
-                    }
-                />
-
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-            </AuthProvider>
-        </BrowserRouter>
+        <AuthContext.Provider value={{ usuario, login, logout }}>
+            {children}
+        </AuthContext.Provider>
     );
-}
-
-export default App;
+};
+    
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth debe ser usado dentro de un AuthProvider");
+    }
+    return context;
+};

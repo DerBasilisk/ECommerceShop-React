@@ -1,4 +1,3 @@
-// src/pages/Admin.jsx
 // Panel de admin con CRUD completo de productos
 // Imagen: subida desde el PC (Base64) con drag & drop
 
