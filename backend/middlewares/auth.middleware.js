@@ -11,6 +11,8 @@ export const verificarToken = async (req, res, next) => {
         }
 
         const token = authHeader.split(" ")[1];
+        console.log("Authorization header:", authHeader);
+        console.log("Token extraído:", token);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         console.log("🔑 Token decodificado:", decoded);

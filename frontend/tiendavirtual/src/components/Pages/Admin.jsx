@@ -1,3 +1,4 @@
+// src/pages/Admin.jsx
 // Panel de admin con CRUD completo de productos
 // Imagen: subida desde el PC (Base64) con drag & drop
 
@@ -138,63 +139,92 @@ export default function AdminPanel() {
   };
   const [form, setForm] = useState(formInicial);
 
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${usuario?.token}`,
-  };
+  const token = localStorage.getItem("token");
+
+const headers = {
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${token}`,
+};
 
   useEffect(() => {
     fetchProductos();
   }, []);
 
   const fetchProductos = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
+  setLoading(true);
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    // 🔥 Garantizar que siempre sea un array
+    if (Array.isArray(data)) {
       setProductos(data);
-    } catch {
-      mostrarMensaje("error", "Error al cargar productos");
-    } finally {
-      setLoading(false);
+    } else if (Array.isArray(data.productos)) {
+      setProductos(data.productos);
+    } else {
+      setProductos([]);
     }
-  };
+
+  } catch (error) {
+    mostrarMensaje("error", "Error al cargar productos");
+    setProductos([]); // seguridad extra
+  } finally {
+    setLoading(false);
+  }
+};
 
   const mostrarMensaje = (tipo, texto) => {
     setMensaje({ tipo, texto });
     setTimeout(() => setMensaje({ tipo: "", texto: "" }), 3000);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.Image) {
-      mostrarMensaje("error", "Debes seleccionar una imagen para el producto");
-      return;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!form.Image) {
+    mostrarMensaje("error", "Debes seleccionar una imagen para el producto");
+    return;
+  }
+
+  try {
+    const url = editando ? `${API_URL}/${editando._id}` : API_URL;
+    const method = editando ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        productId: form.productId,
+        nombre: form.Nombre,
+        descripcion: form.Descripcion,
+        precio: parseFloat(form.Precio),
+        imagen: form.Image, // 🔥 AQUÍ ESTÁ LA CLAVE
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Error al guardar producto");
     }
-    try {
-      const url = editando ? `${API_URL}/${editando._id}` : API_URL;
-      const method = editando ? "PUT" : "POST";
-      const res = await fetch(url, {
-        method,
-        headers,
-        body: JSON.stringify({ ...form, Precio: parseFloat(form.Precio) }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message);
-      }
-      mostrarMensaje(
-        "success",
-        editando ? "Producto actualizado" : "Producto creado"
-      );
-      setForm(formInicial);
-      setEditando(null);
-      setActiveTab("productos");
-      fetchProductos();
-    } catch (err) {
-      mostrarMensaje("error", err.message || "Error al guardar producto");
-    }
-  };
+
+    mostrarMensaje(
+      "success",
+      editando ? "Producto actualizado" : "Producto creado"
+    );
+
+    setForm(formInicial);
+    setEditando(null);
+    setActiveTab("productos");
+    fetchProductos();
+
+  } catch (err) {
+    mostrarMensaje("error", err.message || "Error al guardar producto");
+  }
+};
 
   const handleEliminar = async (id) => {
     if (!confirm("¿Eliminar este producto?")) return;
@@ -227,12 +257,12 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
       {/* ── Header ── */}
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-linear-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
               <svg
                 width="20"
                 height="20"
@@ -264,7 +294,7 @@ export default function AdminPanel() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* ── Tarjetas estadísticas ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
             <div className="flex justify-between items-center mb-3">
               <div className="bg-white/20 p-2.5 rounded-lg">
                 <svg
@@ -283,12 +313,12 @@ export default function AdminPanel() {
             <p className="font-semibold">Productos</p>
             <p className="text-blue-100 text-xs mt-1">En catálogo</p>
           </div>
-          <div className="bg-linear-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white">
             <span className="text-4xl font-bold">–</span>
             <p className="font-semibold mt-3">Pedidos hoy</p>
             <p className="text-green-100 text-xs mt-1">Ver en panel de pedidos</p>
           </div>
-          <div className="bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
             <span className="text-4xl font-bold">–</span>
             <p className="font-semibold mt-3">Usuarios</p>
             <p className="text-purple-100 text-xs mt-1">Registrados</p>
@@ -371,7 +401,8 @@ export default function AdminPanel() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {productos.map((prod) => (
+                      {Array.isArray(productos) &&
+                        productos.map((prod) => (
                         <tr key={prod._id} className="hover:bg-gray-50 transition-colors">
                           <td className="py-3.5 pl-2">
                             <div className="flex items-center gap-3">
@@ -506,7 +537,7 @@ export default function AdminPanel() {
                 <div className="flex gap-3 pt-2">
                   <button
                     type="submit"
-                    className="flex-1 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-xl font-semibold text-sm"
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-xl font-semibold text-sm"
                   >
                     {editando ? "💾 Guardar Cambios" : "➕ Crear Producto"}
                   </button>

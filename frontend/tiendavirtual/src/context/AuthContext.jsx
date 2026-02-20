@@ -5,30 +5,36 @@ import axios from "axios";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [usuario, setUsuario] = useState(null);
+    const [usuario, setUsuario] = useState(() => {
+        const storedUser = localStorage.getItem("usuario");
+        return storedUser ? JSON.parse(storedUser) : null;
+    });
     const navigate = useNavigate();
 
     const login = async (correo, password) => {
         try {
-            const response = await axios.post("http://localhost:8081/api/login",
-                { correo:correo, 
-                    passwords:password,});
-
-
-            const data = response.data;
-
-
-            setUsuario({
-                ...data.usuario, 
-                token: data.token 
+            const response = await axios.post("http://localhost:8081/api/login", {
+                correo: correo,
+                passwords: password,
             });
 
-            if(data.usuario.rol === "admin") {
+            const data = response.data;
+            console.log("📦 Respuesta del backend:", data); // ← agrega esto
+            console.log("🔑 Token recibido:", data.token);  // ← y esto
+
+            const usuarioCompleto = {
+                ...data.usuario,
+                token: data.token,
+            };
+
+            localStorage.setItem("usuario", JSON.stringify(usuarioCompleto));
+            setUsuario(usuarioCompleto);
+
+            if (data.usuario.rol === "admin") {
                 navigate("/admin");
             } else {
                 navigate("/productos");
             }
-        
         } catch (error) {
             if (error.response) {
                 throw new Error(error.response.data.message || "Error al iniciar sesión");
@@ -38,11 +44,13 @@ export const AuthProvider = ({ children }) => {
                 throw new Error("Error al procesar la solicitud");
             }
         }
-
     };
 
     const logout = () => {
+        // ✅ FIX: Limpiar localStorage al cerrar sesión para evitar
+        // que un token expirado o incompleto se restaure en la próxima visita
         setUsuario(null);
+        localStorage.removeItem("usuario");
         navigate("/login");
     };
 
@@ -52,7 +60,7 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-    
+
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
