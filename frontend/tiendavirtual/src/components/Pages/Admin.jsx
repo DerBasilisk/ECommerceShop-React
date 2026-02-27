@@ -4,14 +4,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { LogOut } from 'lucide-react';
 
 const API_URL = "http://localhost:8081/api/productos";
+
 
 // ── Componente uploader de imagen ─────────────────────────────────────────
 function ImageUploader({ value, onChange }) {
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef();
-
+  const { usuario } = useAuth();
   const processFile = (file) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -42,6 +44,9 @@ function ImageUploader({ value, onChange }) {
     onChange("");
     if (inputRef.current) inputRef.current.value = "";
   };
+  
+  
+  
 
   return (
     <div>
@@ -129,14 +134,19 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState("productos");
   const [editando, setEditando] = useState(null);
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
+  const getInitials = () => {
+    const n = usuario?.nombre?.[0] || "";
+    const a = usuario?.apellido?.[0] || "";
+    return (n + a).toUpperCase() || "U";
+  };
   
 
   const formInicial = {
     productId: "",
-    Nombre: "",
-    Descripcion: "",
-    Precio: "",
-    Image: "",
+    nombre: "",
+    descripcion: "",
+    precio: "",
+    imagen: "",
   };
   const [form, setForm] = useState(formInicial);
 
@@ -193,7 +203,7 @@ const headers = {
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (!form.Image) {
+  if (!form.imagen) {
     mostrarMensaje("error", "Debes seleccionar una imagen para el producto");
     return;
   }
@@ -213,7 +223,7 @@ const handleSubmit = async (e) => {
         nombre: form.nombre,
         descripcion: form.descripcion,
         precio: parseFloat(form.precio),
-        imagen: form.image, // 🔥 AQUÍ ESTÁ LA CLAVE
+        imagen: form.imagen, // 🔥 AQUÍ ESTÁ LA CLAVE
       }),
     });
 
@@ -257,7 +267,7 @@ const handleSubmit = async (e) => {
       nombre: prod.nombre || "",
       descripcion: prod.descripcion || "",
       precio: prod.precio?.toString() || "",
-      image: prod.image || "",
+      imagen: prod.imagen || "",
     });
     setActiveTab("agregar");
   };
@@ -293,12 +303,19 @@ const handleSubmit = async (e) => {
               <p className="font-semibold text-gray-800">{usuario?.nombre}</p>
               <p className="text-xs text-purple-500 font-medium">Administrador</p>
             </div>
-            <button
-              onClick={logout}
-              className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            
+            <a href="/profile"
+              className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center font-bold text-xl shadow-md hover:scale-105 transition-transform"
             >
-              Salir
-            </button>
+              {getInitials()}
+            </a>
+            <button
+                onClick={logout}
+                title="Cerrar sesión"
+                className="p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 group"
+              >
+                <LogOut className="w-5 h-5 text-gray-500 group-hover:text-red-500 transition-colors" />
+              </button>
           </div>
         </div>
       </header>
@@ -419,9 +436,9 @@ const handleSubmit = async (e) => {
                           <td className="py-3.5 pl-2">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
-                                {prod.Image ? (
+                                {prod.imagen ? (
                                   <img
-                                    src={prod.image}
+                                    src={prod.imagen}
                                     alt={prod.nombre}
                                     className="w-full h-full object-cover"
                                     onError={(e) =>
@@ -479,7 +496,7 @@ const handleSubmit = async (e) => {
           {activeTab === "agregar" && (
             <div className="p-6 max-w-xl">
               <h3 className="font-bold text-gray-800 text-lg mb-6">
-                {editando ? `Editando: ${editando.Nombre}` : "Nuevo Producto"}
+                {editando ? `Editando: ${editando.nombre}` : "Nuevo Producto"}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -506,9 +523,9 @@ const handleSubmit = async (e) => {
                       type="number"
                       min="0"
                       step="0.01"
-                      value={form.Precio}
+                      value={form.precio}
                       required
-                      onChange={(e) => setForm({ ...form, Precio: e.target.value })}
+                      onChange={(e) => setForm({ ...form, precio: e.target.value })}
                       placeholder="0.00"
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition"
                     />
@@ -520,9 +537,9 @@ const handleSubmit = async (e) => {
                   </label>
                   <input
                     type="text"
-                    value={form.Nombre}
+                    value={form.nombre}
                     required
-                    onChange={(e) => setForm({ ...form, Nombre: e.target.value })}
+                    onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                     placeholder="Nombre del producto"
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition"
                   />
@@ -532,19 +549,19 @@ const handleSubmit = async (e) => {
                     Descripción *
                   </label>
                   <textarea
-                    value={form.Descripcion}
+                    value={form.descripcion}
                     required
                     rows={3}
                     onChange={(e) =>
-                      setForm({ ...form, Descripcion: e.target.value })
+                      setForm({ ...form, descripcion: e.target.value })
                     }
                     placeholder="Descripción del producto"
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition resize-none"
                   />
                 </div>
                 <ImageUploader
-                  value={form.Image}
-                  onChange={(base64) => setForm({ ...form, Image: base64 })}
+                  value={form.imagen}
+                  onChange={(base64) => setForm({ ...form, imagen: base64 })}
                 />
                 <div className="flex gap-3 pt-2">
                   <button

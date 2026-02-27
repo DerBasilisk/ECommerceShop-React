@@ -34,7 +34,7 @@ export default function Login() {
             setLoading(false);
         }
     }
-    return (
+    return (  
         <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-linear-to-br from-blue-50 via-white to-purple-50">
             <div className="w-full max-w-md">
                 

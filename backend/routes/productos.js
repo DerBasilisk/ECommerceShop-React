@@ -6,7 +6,7 @@ import { crearProducto, obtenerProducto, actualizarProducto, eliminarProducto
 const router = express.Router();
 
 router.post("/", verificarToken, soloAdmin, crearProducto);
-router.get("/", verificarToken, obtenerProducto);
+router.get("/", obtenerProducto);
 router.put("/:id", verificarToken, soloAdmin, actualizarProducto);
 router.delete("/:id", verificarToken, soloAdmin, eliminarProducto)
 
