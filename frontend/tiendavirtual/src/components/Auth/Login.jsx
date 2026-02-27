@@ -1,67 +1,36 @@
 import { useState } from "react";
+import { User, Mail, Lock, Eye, EyeOff, LogIn, Loader2, Shield } from "lucide-react";
+import { useAuth } from "../../context/AuthContext"; // ✅ importa el contexto
 import { useNavigate } from "react-router-dom";
-import {User, Mail, Lock, Eye, EyeOff, LogIn, Loader2, Shield } from "lucide-react";
-import axios from "axios";
 
-export default function Login(){
+export default function Login() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState({type: '', text: ''});
-    const navigate = useNavigate();
+    const [message, setMessage] = useState({ type: '', text: '' });
+
+    const { login } = useAuth(); // ✅ obtén la función login del contexto
+    // ❌ ya no necesitas useNavigate ni axios aquí, AuthContext los maneja
 
     async function handleSubmit(e) {
         e.preventDefault();
         setLoading(true);
-        setMessage({type: '', text: '' });
+        setMessage({ type: '', text: '' });
         try {
-            const response = await axios.post('http://localhost:8081/api/login', {
-                correo: email,
-                passwords: password
-            });
-            const data = response.data; //axios parsea el JSON automaticamente
-            setMessage({
-                type: 'success',
-                text: `¡Bienvenido ${data.usuario.nombre}!`
-            });
-            console.log('usuario:',data.usuario);
-            localStorage.setItem('usuario', JSON.stringify(data.usuario));
-            //Navegar despues de 2 segundo
-            setTimeout(()=>{
-                navigate('/');
-            }, 2000);
-        } catch (error) {
-            console.error('Error:', error);
+            await login(email, password); // ✅ usa el login del contexto
+            // AuthContext ya guarda el token, el usuario y hace el navigate
+            setMessage({ type: 'success', text: `¡Bienvenido!` });
 
-            //Manejo de errores con AXIOS
-            if (error.response){
-                //EL SERVIDOR RESPONDIO CON UN CODIGO DE ERROR
-                if (error.response.status === 404){
-                    setMessage({type: 'error', text: 'Usuario no encontrado'});
-                }else if(error.response.status === 401){
-                    setMessage({type: 'error', text: 'contraseña incorrecta'});
-                }else{
-                    setMessage({
-                        type: 'error',
-                        text: error.response.data.message || 'Error al iniciar sesion'
-                    });
-                }
-            }else if(error.request){
-                //LA PETICION SE HIZO PERO NO HUBO RESPUESTA
-                setMessage({
-                    type: 'error',
-                    text: 'No se pudo conectar con el servidor.'
-                });
-            }else{
-                //ERROR AL CONFIGURAR LA PETICION
-                setMessage({
-                    type: 'error',
-                    text: 'Error al procesar la solicitud.'
-                });
-            }
-        }finally{
+        } catch (error) {
+            // AuthContext lanza el error con el mensaje del backend
+            setMessage({
+                type: 'error',
+                text: error.message || 'Error al iniciar sesión'
+            });
+        } finally {
             setLoading(false);
         }
     }
@@ -115,9 +84,7 @@ export default function Login(){
                                     value={password}
                                     onKeyDown={e => e.key === 'Enter' && handleSubmit(e)}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 pr-12 text-gray-900" />
-                                    required
-                               
-                                
+                                    
                                 <button type="button"  onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
                                     {showPassword ? (
                                         <EyeOff className="w-5 h-5" />
@@ -139,7 +106,7 @@ export default function Login(){
                                 
                                 <span className="ml-2 text-sm text-gray-700">Recordarme</span>
                             </label>
-                            <button type="button" className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                            <button onClick={() => navigate("/forgot-password")} className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
                                 ¿Olvidaste tu contraseña?
                             </button>
                         </div>

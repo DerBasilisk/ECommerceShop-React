@@ -53,7 +53,7 @@ export const loginuser = async (req, res) => {
         telefono: usuario.telefono,
         correo: usuario.correo,
         rol: usuario.rol
-        // ❌ NO enviar passwords
+        
       }
     });
 

@@ -1,4 +1,4 @@
-// src/pages/Admin.jsx
+// src/components/pages/Admin.jsx
 // Panel de admin con CRUD completo de productos
 // Imagen: subida desde el PC (Base64) con drag & drop
 
@@ -129,6 +129,7 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState("productos");
   const [editando, setEditando] = useState(null);
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
+  
 
   const formInicial = {
     productId: "",
@@ -139,39 +140,50 @@ export default function AdminPanel() {
   };
   const [form, setForm] = useState(formInicial);
 
-  const token = localStorage.getItem("token");
+// ✅ DESPUÉS
+const token = usuario?.token; // viene del AuthContext
 
 const headers = {
   "Content-Type": "application/json",
   Authorization: `Bearer ${token}`,
 };
-
   useEffect(() => {
-    fetchProductos();
+    if (usuario?.token){
+    fetchProductos()};
   }, []);
 
   const fetchProductos = async () => {
-  setLoading(true);
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-
-    // 🔥 Garantizar que siempre sea un array
-    if (Array.isArray(data)) {
-      setProductos(data);
-    } else if (Array.isArray(data.productos)) {
-      setProductos(data.productos);
-    } else {
+    setLoading(true);
+    try {
+      const res = await fetch(API_URL, {
+        headers: {
+          Authorization: `Bearer ${usuario?.token}`, // ✅ agrega el token
+        },
+      });
+  
+      if (!res.ok) {
+        mostrarMensaje("error", "Error al obtener productos");
+        setProductos([]);
+        return;
+      }
+  
+      const data = await res.json();
+  
+      if (Array.isArray(data)) {
+        setProductos(data);
+      } else if (Array.isArray(data.productos)) {
+        setProductos(data.productos);
+      } else {
+        setProductos([]);
+      }
+  
+    } catch (error) {
+      mostrarMensaje("error", "Error al cargar productos");
       setProductos([]);
+    } finally {
+      setLoading(false);
     }
-
-  } catch (error) {
-    mostrarMensaje("error", "Error al cargar productos");
-    setProductos([]); // seguridad extra
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const mostrarMensaje = (tipo, texto) => {
     setMensaje({ tipo, texto });
@@ -198,10 +210,10 @@ const handleSubmit = async (e) => {
       },
       body: JSON.stringify({
         productId: form.productId,
-        nombre: form.Nombre,
-        descripcion: form.Descripcion,
-        precio: parseFloat(form.Precio),
-        imagen: form.Image, // 🔥 AQUÍ ESTÁ LA CLAVE
+        nombre: form.nombre,
+        descripcion: form.descripcion,
+        precio: parseFloat(form.precio),
+        imagen: form.image, // 🔥 AQUÍ ESTÁ LA CLAVE
       }),
     });
 
@@ -242,10 +254,10 @@ const handleSubmit = async (e) => {
     setEditando(prod);
     setForm({
       productId: prod.productId || "",
-      Nombre: prod.Nombre || "",
-      Descripcion: prod.Descripcion || "",
-      Precio: prod.Precio?.toString() || "",
-      Image: prod.Image || "",
+      nombre: prod.nombre || "",
+      descripcion: prod.descripcion || "",
+      precio: prod.precio?.toString() || "",
+      image: prod.image || "",
     });
     setActiveTab("agregar");
   };
@@ -319,7 +331,7 @@ const handleSubmit = async (e) => {
             <p className="text-green-100 text-xs mt-1">Ver en panel de pedidos</p>
           </div>
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
-            <span className="text-4xl font-bold">–</span>
+            <span className="text-4xl font-bold">-</span>
             <p className="font-semibold mt-3">Usuarios</p>
             <p className="text-purple-100 text-xs mt-1">Registrados</p>
           </div>
@@ -409,8 +421,8 @@ const handleSubmit = async (e) => {
                               <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                                 {prod.Image ? (
                                   <img
-                                    src={prod.Image}
-                                    alt={prod.Nombre}
+                                    src={prod.image}
+                                    alt={prod.nombre}
                                     className="w-full h-full object-cover"
                                     onError={(e) =>
                                       (e.currentTarget.style.display = "none")
@@ -424,7 +436,7 @@ const handleSubmit = async (e) => {
                               </div>
                               <div>
                                 <p className="font-semibold text-gray-800">
-                                  {prod.Nombre}
+                                  {prod.nombre}
                                 </p>
                                 <p className="text-xs text-gray-400">
                                   ID: {prod.productId}
@@ -433,10 +445,10 @@ const handleSubmit = async (e) => {
                             </div>
                           </td>
                           <td className="py-3.5 text-gray-500 max-w-xs">
-                            <p className="truncate">{prod.Descripcion}</p>
+                            <p className="truncate">{prod.descripcion}</p>
                           </td>
                           <td className="py-3.5 font-bold text-gray-800">
-                            ${parseFloat(prod.Precio).toFixed(2)}
+                            ${parseFloat(prod.precio).toFixed(2)}
                           </td>
                           <td className="py-3.5 pr-2">
                             <div className="flex items-center justify-end gap-2">

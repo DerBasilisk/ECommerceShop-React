@@ -6,6 +6,8 @@ import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import Admin from "./components/Pages/Admin";
 import Home from "./components/Pages/Home";
+import ForgotPassword from "./components/Pages/ForgotPassword";
+import VerifyCode from "./components/Pages/VerifyCode";
 
 function App() {
   return (
@@ -17,7 +19,7 @@ function App() {
           <Route path="/register" element={<Register />} />
 
           <Route
-            path="/productos"
+            path="/"
             element={
               <PrivateRoute rolRequerido="user">
                 <div>Productos</div>
@@ -33,6 +35,9 @@ function App() {
               </PrivateRoute>
             }
           />
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-code" element={<VerifyCode />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -47,10 +47,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        // ✅ FIX: Limpiar localStorage al cerrar sesión para evitar
-        // que un token expirado o incompleto se restaure en la próxima visita
         setUsuario(null);
         localStorage.removeItem("usuario");
+        localStorage.removeItem("token"); // por si quedó algo viejo
         navigate("/login");
     };
 
