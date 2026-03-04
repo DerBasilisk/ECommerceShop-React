@@ -1,37 +1,12 @@
-import { useState, useEffect } from 'react';
-import { ShoppingCart } from 'lucide-react'; // Opcional, para el botón
+import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 
-function ProductsCat() {
-    // 1. Estados para los datos, carga y posibles errores
-    const [productos, setProductos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+function ProductsCat({ productos, loading, error }) { // 👈 recibe props
     const { addToCart } = useCart();
 
-    // 2. useEffect para llamar a tu API al montar el componente
-    useEffect(() => {
-        const obtenerProductos = async () => {
-            try {
-                const response = await fetch('http://localhost:8081/api/productos');
-                if (!response.ok) {
-                    throw new Error('No se pudo conectar con el servidor');
-                }
-                const data = await response.json();
-                setProductos(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        obtenerProductos();
-    }, []);
-
-    // 3. Manejo de estados visuales (Carga y Error)
     if (loading) return <div className="text-center p-10">Cargando productos...</div>;
     if (error) return <div className="text-center p-10 text-red-500">Error: {error}</div>;
+    if (productos.length === 0) return <div className="text-center p-10 text-gray-500">No se encontraron productos.</div>;
 
     return (
         <section className="bg-gray-50 py-8">
