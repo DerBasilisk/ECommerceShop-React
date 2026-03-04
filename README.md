@@ -6,6 +6,8 @@ React eCommerce/
 │   ├── .env
 │   ├── .gitignore
 │   ├── controllers/
+│   │   ├── chatController.js
+│   │   ├── contactController.js
 │   │   ├── login.js
 │   │   ├── ologin.js
 │   │   ├── pedido.js
@@ -19,6 +21,8 @@ React eCommerce/
 │   │   ├── auth.middleware.js
 │   │   ├── oauth.middleware.js
 │   ├── models/
+│   │   ├── contact.js
+│   │   ├── message.js
 │   │   ├── pedido.js
 │   │   ├── productos.js
 │   │   ├── user.js
@@ -26,6 +30,8 @@ React eCommerce/
 │   ├── package.json
 │   ├── routes/
 │   │   ├── admin.js
+│   │   ├── chat.js
+│   │   ├── contactRoutes.js
 │   │   ├── login.js
 │   │   ├── pedido.js
 │   │   ├── perfil.js
@@ -64,6 +70,8 @@ React eCommerce/
 │   │   │   │   │   ├── Callus.jsx
 │   │   │   │   │   ├── Cart.jsx
 │   │   │   │   │   ├── Categories.jsx
+│   │   │   │   │   ├── ChatList.jsx
+│   │   │   │   │   ├── ChatWindow.jsx
 │   │   │   │   │   ├── FeatureProducts.jsx
 │   │   │   │   │   ├── Filter.jsx
 │   │   │   │   │   ├── Footer.jsx
@@ -71,20 +79,24 @@ React eCommerce/
 │   │   │   │   │   ├── Navbar.jsx
 │   │   │   │   │   ├── Newsletter.jsx
 │   │   │   │   │   ├── ProductsCat.jsx
+│   │   │   │   │   ├── UserSearch.jsx
 │   │   │   │   │   ├── Users.jsx
 │   │   │   │   ├── Pages/
 │   │   │   │   │   ├── Admin.jsx
+│   │   │   │   │   ├── ChatPage.jsx
 │   │   │   │   │   ├── Contact.jsx
 │   │   │   │   │   ├── ForgotPassword.jsx
 │   │   │   │   │   ├── Home.jsx
 │   │   │   │   │   ├── Products.jsx
 │   │   │   │   │   ├── Profile.jsx
+│   │   │   │   │   ├── Purshase.jsx
 │   │   │   │   │   ├── VerifyCode.jsx
 │   │   │   │   ├── PrivateRoute.jsx
 │   │   │   │   ├── Saludo.jsx
 │   │   │   │   ├── Sobremi.jsx
 │   │   │   ├── context/
 │   │   │   │   ├── AuthContext.jsx
+│   │   │   │   ├── CartContext.jsx
 │   │   │   ├── index.css
 │   │   │   ├── main.jsx
 │   │   ├── vite.config.js

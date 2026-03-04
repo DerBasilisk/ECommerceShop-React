@@ -8,6 +8,8 @@ import PerfilRouter from "./routes/perfil.js";
 import RecuperarPassword from "./routes/recuperar.js"
 import PedidosRouter from "./routes/pedido.js"
 import adminRoutes from "./routes/admin.js"
+import contactRoutes from './routes/contactRoutes.js';
+import chatRoutes from './routes/chat.js'; // ← agrega esto
 
 const app = express();
 
@@ -29,5 +31,7 @@ app.use("/api/perfil", PerfilRouter);
 app.use("/api/Recuperar", RecuperarPassword);
 app.use("/api/pedidos", PedidosRouter);
 app.use("/api/admin", adminRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/chat', chatRoutes); // ← agrega esto
 
 app.listen(8081, () => console.log('Servidor corriendo en http://localhost:8081'));

@@ -13,6 +13,7 @@ import Products from "./components/Pages/Products"
 import Contact from "./components/Pages/Contact"
 import Profile from "./components/Pages/Profile"
 import Purshase from "./components/Pages/Purshase";
+import ChatPage from "./components/Pages/ChatPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/cart" element={<Purshase />} />
+          <Route path="/chat" element={<ChatPage />} />
 
           <Route
             path="/"

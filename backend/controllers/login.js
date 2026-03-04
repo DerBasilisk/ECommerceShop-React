@@ -46,6 +46,7 @@ export const loginuser = async (req, res) => {
       message: "Inicio Correcto",
       token,
       usuario: {
+        _id: usuario._id.toString(),
         userId: usuario.userId,
         nombre: usuario.nombre,
         apellido: usuario.apellido,

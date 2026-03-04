@@ -49,7 +49,7 @@ function ProductsCat() {
                             </div>
 
                             {/* Info del Producto */}
-                            <div className="p-5 flex flex-col flex-grow">
+                            <div className="p-5 flex flex-col grow">
                                 <h3 className="text-lg font-bold text-gray-800 mb-2">{prod.nombre}</h3>
                                 <p className="text-gray-500 text-sm mb-4 line-clamp-2">{prod.descripcion}</p>
                                 

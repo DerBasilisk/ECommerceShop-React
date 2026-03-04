@@ -70,7 +70,7 @@ function Navbar (){
                 to="/profile"
                 className="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 rounded-xl transition-all duration-300 group"
               >
-                <span className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center font-bold text-xl shadow-md hover:scale-105 transition-transform">
+                <span className="w-12 h-12 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center font-bold text-xl shadow-md hover:scale-105 transition-transform">
                   {getInitials()}
                 </span>
               </Link>
