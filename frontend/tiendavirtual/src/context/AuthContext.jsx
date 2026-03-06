@@ -19,8 +19,8 @@ export const AuthProvider = ({ children }) => {
             });
 
             const data = response.data;
-            console.log("📦 Respuesta del backend:", data); // ← agrega esto
-            console.log("🔑 Token recibido:", data.token);  // ← y esto
+            console.log("📦 Respuesta del backend:", data);
+            console.log("🔑 Token recibido:", data.token);
 
             const usuarioCompleto = {
                 ...data.usuario,
@@ -49,12 +49,19 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         setUsuario(null);
         localStorage.removeItem("usuario");
-        localStorage.removeItem("token"); // por si quedó algo viejo
+        localStorage.removeItem("token");
         navigate("/login");
     };
 
+    // ✅ Nueva función: actualiza el usuario en el estado y en localStorage
+    const actualizarUsuario = (nuevosDatos) => {
+        const usuarioActualizado = { ...usuario, ...nuevosDatos };
+        localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
+        setUsuario(usuarioActualizado);
+    };
+
     return (
-        <AuthContext.Provider value={{ usuario, login, logout }}>
+        <AuthContext.Provider value={{ usuario, login, logout, actualizarUsuario }}>
             {children}
         </AuthContext.Provider>
     );

@@ -2,21 +2,21 @@ function Categories() {
     const categories = [
         {
             id:'laptops',
-            emoji_:'💻',
+            emoji:'💻',
             title: 'Laptops',
             descripcion: 'Las Mejores Marcas y Modelos Para Trabajo Y Gaming'
         },
 
         {
             id:'celulares',
-            emoji_:'📱',
+            emoji:'📱',
             title: 'Celulares',
             descripcion: 'Última tecnologia movil de todas las marcas'
         },
 
         {
             id:'componentes',
-            emoji_:'⚙️',
+            emoji:'⚙️',
             title: 'Componentes',
             descripcion: 'Arma tu PC ideal con todos los componentes'
         },
@@ -49,7 +49,7 @@ function Categories() {
                     {category.description}
                   </p>
                   <div className="text-blue-600 font-semibold">
-                    Ver más →
+                    <a href="/products">Ver más →</a>
                   </div>
                 </div>
               ))}

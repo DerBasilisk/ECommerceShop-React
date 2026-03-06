@@ -86,7 +86,7 @@ const UserSearch = ({ onSelectUser }) => {
               onClick={() => handleSelect(usuario)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 cursor-pointer transition-colors"
             >
-              <div className="flex-shrink-0 w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold text-xs ring-2 ring-white shadow-sm">
+              <div className="shrink-0 w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold text-xs ring-2 ring-white shadow-sm">
                 {usuario.nombre?.[0]?.toUpperCase() ?? '?'}
               </div>
               <div className="flex-1 min-w-0">
